@@ -42,16 +42,20 @@ static int list_child_task(struct task_struct *task, struct list_head *list)
 	return 0;
 }
 
+static void print_task(void)
+{
+	printk(KERN_ALERT "sizeof task_struct is %ld\n", sizeof(struct task_struct));
+	printk(KERN_ALERT "sizeof thread_info is %ld\n", sizeof(struct thread_info));
+}
 static int hello_init(void)
 {
 	struct task_struct *test_task;
 	struct list_head *list;
 	printk(KERN_ALERT "I bear a charmed life!\n");
-	printk(KERN_ALERT "sizeof task_struct is %ld\n", sizeof(struct task_struct));
-	printk(KERN_ALERT "sizeof thread_info is %ld\n", sizeof(struct thread_info));
+
+	print_task();
 	
 	test_task = current_thread_info()->task;
-	printk(KERN_ALERT "current task address is %p\n", test_task);
 	print_taskinfo(test_task);
 	//printk(KERN_ALERT "TASK_RUNNING is %p\n", TASK_RUNNING);
 	set_task_state(test_task, TASK_INTERRUPTIBLE);
@@ -61,11 +65,12 @@ static int hello_init(void)
 	set_task_state(test_task, TASK_RUNNING);
 	printk(KERN_ALERT "after set:\n");
 	print_taskinfo(test_task);
-
+#ifdef PARENT_CHILDREN_PID
 	printk(KERN_ALERT "parent pid:\n");
 	list_parent_task(current);
 	printk(KERN_ALERT "children pid:\n");
 	list_child_task(test_task, list);
+#endif
 	return 0;
 }
 
