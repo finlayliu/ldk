@@ -10,11 +10,12 @@
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <asm/thread_info.h>
+#include <linux/kthread.h>
 
 static void print_taskinfo(struct task_struct *task)
 {
-	printk(KERN_ALERT "\ncurrent task PID is %d\n", task->pid);
-	printk(KERN_ALERT "current task state is %ld\n", task->state);
+	printk(KERN_ALERT "PID:%d\n", task->pid);
+	printk(KERN_ALERT "state:%ld\n", task->state);
 }
 
 static int list_parent_task(struct task_struct *task)
@@ -47,7 +48,8 @@ static void print_task(void)
 	printk(KERN_ALERT "sizeof task_struct is %ld\n", sizeof(struct task_struct));
 	printk(KERN_ALERT "sizeof thread_info is %ld\n", sizeof(struct thread_info));
 }
-static int hello_init(void)
+
+static void test_task(void)
 {
 	struct task_struct *test_task;
 	struct list_head *list;
@@ -70,7 +72,47 @@ static int hello_init(void)
 	list_parent_task(current);
 	printk(KERN_ALERT "children pid:\n");
 	list_child_task(test_task, list);
-#endif
+#endif	
+}
+
+//2014-9-1
+static void test_task1(void)
+{
+	struct task_struct *task;
+	for (task = current; task != &init_task; task = task->parent)
+		print_taskinfo(task);
+}
+
+static void test_task2(void)
+{
+	struct task_struct *task;
+	for_each_process(task)
+		printk("%s[%d]\n", task->comm, task->pid);
+	printk("current:%s[%d]\n", current->comm, current->pid);
+}
+
+static int test_threadfn(void *data)
+{
+	char *k = data;
+	printk("test_threadfn enter!\n");
+	printk("%s\n", k);
+	return 0;
+	
+}
+
+static void test_kthread(void)
+{
+	char *a = "yes,I'm in";
+	struct task_struct *k;
+	k =	kthread_create(test_threadfn, a, "test_finlay");
+	printk("wake up process!\n");
+	wake_up_process(k);
+}
+
+
+static int hello_init(void)
+{
+	test_kthread();	
 	return 0;
 }
 
