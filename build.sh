@@ -7,8 +7,13 @@
 #!/bin/bash
 make 
 dmesg -c
+echo ################################
+echo local prints!!!!
+echo ################################
 insmod helloworld.ko
 dmesg -c
 rmmod helloworld
 dmesg -c
+echo ################################
+echo prints ended!!!!!
 make clean

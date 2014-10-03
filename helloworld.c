@@ -11,6 +11,7 @@
 #include <linux/sched.h>
 #include <asm/thread_info.h>
 #include <linux/kthread.h>
+#include <linux/kfifo.h>
 
 static void print_taskinfo(struct task_struct *task)
 {
@@ -96,6 +97,12 @@ static int test_threadfn(void *data)
 	char *k = data;
 	printk("test_threadfn enter!\n");
 	printk("%s\n", k);
+
+	struct kfifo fifo1;
+	//typeof(fifo1) ttt;
+	struct kfifo ttt;
+
+	printk("kfifo:0x%x,type:0x%x\n", &fifo1, &ttt);
 	return 0;
 	
 }
