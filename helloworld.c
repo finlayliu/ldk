@@ -126,7 +126,7 @@ static int test_threadfn(void *data)
 	printk("%s\n", k);
 	
 	struct kfifo fifo;
-	unsigned int i;
+	unsigned int i, val;
 	int ret;
 	ret = kfifo_alloc(&fifo, SIZE_4K, GFP_KERNEL);
 	
@@ -137,9 +137,27 @@ static int test_threadfn(void *data)
 	for (i = 0; i < 32; i++)
 		kfifo_in(&fifo, &i, sizeof(i));
 
+	print_hex_dump(KERN_DEBUG, "func:", DUMP_PREFIX_ADDRESS,
+	       16, 4, fifo.kfifo.data, 32*4, true);
+	
+	ret = kfifo_out_peek(&fifo, &val, sizeof(val));
+	if (ret != sizeof(val))
+		return -EINVAL;
+	printk(KERN_INFO "0x%08x\n", val); /* should print 0 */
+
+	while (kfifo_avail(&fifo)) {
+		unsigned int val;
+		int ret;
+		
+		/* ... read it, one integer at a time */
+		ret = kfifo_out(&fifo, &val, sizeof(val));
+		if (ret != sizeof(val))
+			return -EINVAL;
+		printk(KERN_INFO "0x%08x\n", val);
+	}
 
 	print_hex_dump(KERN_DEBUG, "func:", DUMP_PREFIX_ADDRESS,
-		       16, 4, fifo.kfifo.data, 32*4, true);
+       16, 4, fifo.kfifo.data, 32*4, true);
 	
 	return 0;
 	
