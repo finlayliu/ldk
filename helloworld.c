@@ -13,6 +13,7 @@
 #include <linux/kthread.h>
 #include <linux/kfifo.h>
 
+#define SIZE_4K 0x2000
 static void print_taskinfo(struct task_struct *task)
 {
 	printk(KERN_ALERT "PID:%d\n", task->pid);
@@ -91,18 +92,55 @@ static void test_task2(void)
 		printk("%s[%d]\n", task->comm, task->pid);
 	printk("current:%s[%d]\n", current->comm, current->pid);
 }
+struct testtest {
+	union {
+		int a[2];
+		struct te {
+			unsigned int ffc:1;
+			unsigned int ffd:3;
+			unsigned int ffe:2;
+			unsigned int fff:2;
+			
+			unsigned int ffg:3;
+			unsigned int ffh:1;
+			
+			unsigned int ffi:4;
+			unsigned int ffj:16;
+			
+			unsigned int ffk:8;
+			unsigned int ffl:12;
+			unsigned int ffm:10;
+			unsigned int ffn:2;
+		} st;
+	};
+	int bbb;
+};
+
+
+
 
 static int test_threadfn(void *data)
 {
 	char *k = data;
 	printk("test_threadfn enter!\n");
 	printk("%s\n", k);
+	
+	struct kfifo fifo;
+	unsigned int i;
+	int ret;
+	ret = kfifo_alloc(&fifo, SIZE_4K, GFP_KERNEL);
+	
+	if (ret)
+		return ret;
 
-	struct kfifo fifo1;
-	//typeof(fifo1) ttt;
-	struct kfifo ttt;
+	/* enqueue [0, 32) to the kfifo named ??fifo?бе */
+	for (i = 0; i < 32; i++)
+		kfifo_in(&fifo, &i, sizeof(i));
 
-	printk("kfifo:0x%x,type:0x%x\n", &fifo1, &ttt);
+
+	print_hex_dump(KERN_DEBUG, "func:", DUMP_PREFIX_ADDRESS,
+		       16, 4, fifo.kfifo.data, 32*4, true);
+	
 	return 0;
 	
 }
