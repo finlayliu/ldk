@@ -12,6 +12,7 @@
 #include <asm/thread_info.h>
 #include <linux/kthread.h>
 #include <linux/kfifo.h>
+#include <linux/idr.h>
 
 #define SIZE_4K 0x2000
 static void print_taskinfo(struct task_struct *task)
@@ -134,8 +135,11 @@ static int test_threadfn(void *data)
 		return ret;
 
 	/* enqueue [0, 32) to the kfifo named ??fifo?бе */
-	for (i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++) {
 		kfifo_in(&fifo, &i, sizeof(i));
+	print_hex_dump(KERN_DEBUG, "func0:", DUMP_PREFIX_ADDRESS,
+	       16, 4, fifo.kfifo.data, 4, true);
+	}
 
 	print_hex_dump(KERN_DEBUG, "func:", DUMP_PREFIX_ADDRESS,
 	       16, 4, fifo.kfifo.data, 32*4, true);
@@ -172,10 +176,42 @@ static void test_kthread(void)
 	wake_up_process(k);
 }
 
+static void test_map(void)
+{
+	struct idr idr_huh;
+	void *ptr = "hello moto!";
+	void *ptr0 = "ok google!";
+	void *ptr1;
+	int id, id0, ret;
+	
+	idr_init(&idr_huh);
+
+	do {
+		if (!idr_pre_get(&idr_huh, GFP_KERNEL))
+			return -ENOSPC;
+		ret = idr_get_new(&idr_huh, ptr, &id);
+	} while (ret == -EAGAIN);
+
+	do {
+		if (!idr_pre_get(&idr_huh, GFP_KERNEL))
+			return -ENOSPC;
+		ret = idr_get_new(&idr_huh, ptr0, &id0);
+	} while (ret == -EAGAIN);
+
+	printk(KERN_ALERT "%s, id is %d, ptr is 0x%x,ptr:%s\n", __func__, id, ptr, ptr);
+	printk(KERN_ALERT "%s, id0 is %d, ptr0 is 0x%x,ptr0:%s\n", __func__, id0, ptr0, ptr0);
+	
+	ptr1 = idr_find(&idr_huh, id);
+	printk(KERN_ALERT "%s, ptr1 addr:0x%x, ptr1:%s\n", __func__, ptr1, ptr1);
+
+	ptr1 = idr_find(&idr_huh, id0);
+	printk(KERN_ALERT "%s, ptr0 addr:0x%x, ptr0:%s\n", __func__, ptr0, ptr0);
+}
 
 static int hello_init(void)
 {
-	test_kthread();	
+	//test_kthread();	
+	test_map();
 	return 0;
 }
 
