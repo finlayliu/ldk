@@ -13,6 +13,7 @@
 #include <linux/kthread.h>
 #include <linux/kfifo.h>
 #include <linux/idr.h>
+#include <linux/interrupt.h>
 
 #define SIZE_4K 0x2000
 static void print_taskinfo(struct task_struct *task)
@@ -208,10 +209,29 @@ static void test_map(void)
 	printk(KERN_ALERT "%s, ptr0 addr:0x%x, ptr0:%s\n", __func__, ptr0, ptr0);
 }
 
+static void task1(unsigned long addr)
+{
+	char * test_addr = (char *)addr;
+	printk(KERN_ALERT"%s:I'm here!!\n", __func__);
+	printk(KERN_INFO"%s:her name is %s\n", __func__, test_addr);
+}
+static void test_tasklet(void)
+{
+	struct tasklet_struct task_test;
+	char *nm = "lucy";
+	printk("%s:begin!!\n", __func__);
+	//DECLARE_TASKLET(task_test, task1, (unsigned long)nm);
+	tasklet_init(&task_test, task1, nm);
+	//tasklet_schedule(&task_test);
+	printk("%s:end!!\n", __func__);
+}
+
 static int hello_init(void)
 {
 	//test_kthread();	
-	test_map();
+	//test_map();
+	printk("%s,enter!\n", __func__);
+	test_tasklet();
 	return 0;
 }
 
