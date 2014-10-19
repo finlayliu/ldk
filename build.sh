@@ -11,7 +11,6 @@ echo ################################
 echo local prints!!!!
 echo ################################
 insmod helloworld.ko
-dmesg -c
 rmmod helloworld
 dmesg -c
 echo ################################
