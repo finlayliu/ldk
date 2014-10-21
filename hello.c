@@ -230,8 +230,8 @@ static int hello_init(void)
 {
 	//test_kthread();	
 	//test_map();
-	printk("%s,enter!\n", __func__);
-	test_tasklet();
+	printk(KERN_ALERT "hello,enter!\n");
+	//test_tasklet();
 	return 0;
 }
 
