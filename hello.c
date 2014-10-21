@@ -1,9 +1,9 @@
-/*************************************************************************
+/******************************************************************
 	> File Name: helloworld.c
 	> Author: finlay
 	> Mail: liufy.thu@gmail.com 
 	> Created Time: Sun 20 Jul 2014 11:24:28 HKT
- ************************************************************************/
+******************************************************************/
 
 #include <linux/init.h>
 #include <linux/module.h>
@@ -226,13 +226,12 @@ static void test_tasklet(void)
 	printk("%s:end!!\n", __func__);
 }
 
-static int hello_init(void)
+static void hello_init(void)
 {
 	//test_kthread();	
 	//test_map();
 	printk(KERN_ALERT "hello,enter!\n");
 	//test_tasklet();
-	return 0;
 }
 
 static void hello_exit(void)
