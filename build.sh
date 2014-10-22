@@ -10,8 +10,8 @@ dmesg -c
 echo ################################
 echo local prints!!!!
 echo ################################
-insmod helloworld.ko
-rmmod helloworld
+insmod hello.ko
+rmmod hello
 dmesg -c
 echo ################################
 echo prints ended!!!!!
