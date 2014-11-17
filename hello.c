@@ -226,12 +226,13 @@ static void test_tasklet(void)
 	printk("%s:end!!\n", __func__);
 }
 
-static void hello_init(void)
+static int hello_init(void)
 {
 	//test_kthread();	
 	//test_map();
 	printk(KERN_ALERT "hello,enter!\n");
 	//test_tasklet();
+	return 0;
 }
 
 static void hello_exit(void)
