@@ -1,7 +1,7 @@
 ifneq ($(KERNELRELEASE),)
 	obj-m := hello.o
 else
-	KERNELDIR := /home/finlay/raspberry_pi/linux
+	KERNELDIR := /home/finlay/trunk/raspberry_pi_bplus/linux
     CCPREFIX := /home/finlay/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-
 	PWD :=$(shell pwd)
 default:
