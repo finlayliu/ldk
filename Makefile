@@ -7,7 +7,7 @@ else
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules ARCH=arm CROSS_COMPILE=${CCPREFIX}
 clean:
-	rm -rf *.ko *.o *.mod.o *.mod.c *.symvers modul* .h* .b* .M* .t*
+	rm -rf *.o *.mod.o *.mod.c *.symvers modul* .h* .b* .M* .t*
 endif
 
 #obj-m := helloworld.o
