@@ -16,6 +16,7 @@
 #include <linux/interrupt.h>
 
 #define SIZE_4K 0x2000
+#define	PARENT_CHILDREN_PID
 static void print_taskinfo(struct task_struct *task)
 {
 	printk(KERN_ALERT "PID:%d\n", task->pid);
@@ -63,7 +64,6 @@ static void test_task(void)
 	
 	test_task = current_thread_info()->task;
 	print_taskinfo(test_task);
-	//printk(KERN_ALERT "TASK_RUNNING is %p\n", TASK_RUNNING);
 	set_task_state(test_task, TASK_INTERRUPTIBLE);
 	printk(KERN_ALERT "after set:\n");
 	print_taskinfo(test_task);
@@ -117,8 +117,6 @@ struct testtest {
 	};
 	int bbb;
 };
-
-
 
 
 static int test_threadfn(void *data)
@@ -177,12 +175,12 @@ static void test_kthread(void)
 	wake_up_process(k);
 }
 
-static void test_map(void)
+static int test_map(void)
 {
 	struct idr idr_huh;
-	void *ptr = "hello moto!";
-	void *ptr0 = "ok google!";
-	void *ptr1;
+	char *ptr = "hello moto!";
+	char *ptr0 = "ok google!";
+	char *ptr1;
 	int id, id0, ret;
 	
 	idr_init(&idr_huh);
@@ -199,39 +197,42 @@ static void test_map(void)
 		ret = idr_get_new(&idr_huh, ptr0, &id0);
 	} while (ret == -EAGAIN);
 
-	printk(KERN_ALERT "%s, id is %d, ptr is 0x%x,ptr:%s\n", __func__, id, ptr, ptr);
-	printk(KERN_ALERT "%s, id0 is %d, ptr0 is 0x%x,ptr0:%s\n", __func__, id0, ptr0, ptr0);
+	printk(KERN_ALERT "%s, id is %d, ptr is 0x%p,ptr:%s\n", __func__, id, ptr, ptr);
+	printk(KERN_ALERT "%s, id0 is %d, ptr0 is 0x%p,ptr0:%s\n", __func__, id0, ptr0, ptr0);
 	
 	ptr1 = idr_find(&idr_huh, id);
-	printk(KERN_ALERT "%s, ptr1 addr:0x%x, ptr1:%s\n", __func__, ptr1, ptr1);
+	printk(KERN_ALERT "%s, ptr1 addr:0x%p, ptr1:%s\n", __func__, ptr1, ptr1);
 
 	ptr1 = idr_find(&idr_huh, id0);
-	printk(KERN_ALERT "%s, ptr0 addr:0x%x, ptr0:%s\n", __func__, ptr0, ptr0);
+	printk(KERN_ALERT "%s, ptr0 addr:0x%p, ptr0:%s\n", __func__, ptr0, ptr0);
+	return 0;
 }
 
 static void task1(unsigned long addr)
 {
-	char * test_addr = (char *)addr;
+	//char * test_addr = (char *)addr;
 	printk(KERN_ALERT"%s:I'm here!!\n", __func__);
-	printk(KERN_INFO"%s:her name is %s\n", __func__, test_addr);
+	//printk(KERN_INFO"%s:her name is %s\n", __func__, test_addr);
 }
 static void test_tasklet(void)
 {
 	struct tasklet_struct task_test;
-	char *nm = "lucy";
 	printk("%s:begin!!\n", __func__);
 	//DECLARE_TASKLET(task_test, task1, (unsigned long)nm);
-	tasklet_init(&task_test, task1, nm);
-	//tasklet_schedule(&task_test);
+	tasklet_init(&task_test, task1, NULL);
+	tasklet_schedule(&task_test);
 	printk("%s:end!!\n", __func__);
 }
 
 static int hello_init(void)
 {
-	//test_kthread();	
-	//test_map();
+	test_kthread();	
+	test_map();
 	printk(KERN_ALERT "hello,enter!\n");
+	test_task();
 	//test_tasklet();
+	test_task1();
+	test_task2();
 	return 0;
 }
 
