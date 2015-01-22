@@ -5,14 +5,14 @@
 # Created Time: Mon 01 Sep 2014 12:31:30 AM CST
 #########################################################################
 #!/bin/bash
-make -f makefile
-dmesg -c
+sudo make -f origin.mk
+sudo dmesg -c
 echo ################################
 echo local prints!!!!
 echo ################################
-insmod hello.ko
-rmmod hello
-dmesg -c
+sudo insmod hello.ko
+sudo rmmod hello
+sudo dmesg -c
 echo ################################
 echo prints ended!!!!!
-make clean
+sudo make clean
