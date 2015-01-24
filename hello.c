@@ -10,6 +10,7 @@
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <asm/thread_info.h>
+#include <asm-generic/delay.h>
 #include <linux/kthread.h>
 #include <linux/kfifo.h>
 #include <linux/idr.h>
@@ -217,22 +218,26 @@ static void task1(unsigned long addr)
 static void test_tasklet(void)
 {
 	struct tasklet_struct task_test;
-	printk("%s:begin!!\n", __func__);
+	printk(KERN_ALERT "%s:begin!!\n", __func__);
 	//DECLARE_TASKLET(task_test, task1, (unsigned long)nm);
-	tasklet_init(&task_test, task1, NULL);
+	tasklet_init(&task_test, task1, 0);
+	//udelay(1000);
+	//printk(KERN_ALERT "delay\n");
 	tasklet_schedule(&task_test);
-	printk("%s:end!!\n", __func__);
+	printk(KERN_ALERT "%s:end!!\n", __func__);
 }
 
 static int hello_init(void)
-{
+{	
 	test_kthread();	
 	test_map();
-	printk(KERN_ALERT "hello,enter!\n");
 	test_task();
-	//test_tasklet();
+	test_tasklet();
 	test_task1();
 	test_task2();
+
+	printk(KERN_ALERT "hello,enter!\n");
+
 	return 0;
 }
 
